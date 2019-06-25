@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Domain
 {
-    class Client
+    public class Client
     {
         [Key]
         public int Id { get; set; }

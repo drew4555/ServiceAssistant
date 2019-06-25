@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using serviceAssistants.Areas.Identity.Data;
+using serviceAssistants.Areas.Identity;
+using serviceAssistants.Models;
 
 [assembly: HostingStartup(typeof(serviceAssistants.Areas.Identity.IdentityHostingStartup))]
 namespace serviceAssistants.Areas.Identity
@@ -19,8 +20,7 @@ namespace serviceAssistants.Areas.Identity
                     options.UseSqlServer(
                         context.Configuration.GetConnectionString("ApplicationDbContextConnection")));
 
-                services.AddDefaultIdentity<IdentityUser>()
-                    .AddEntityFrameworkStores<ApplicationDbContext>();
+
             });
         }
     }

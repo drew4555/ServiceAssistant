@@ -58,8 +58,9 @@ namespace serviceAssistants.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            [Display(Name = "Super Admin")]
+            [Display(Name= "Super Admin")]
             public bool isSuperAdmin { get; set; }
+
         }
 
         public void OnGet(string returnUrl = null)
@@ -72,15 +73,15 @@ namespace serviceAssistants.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
-                    if (!await _roleManager.RoleExistsAsync(StaticDetails.AdminEndUser))
+                    if(!await _roleManager.RoleExistsAsync(StaticDetails.AdminEndUser))
                     {
                         await _roleManager.CreateAsync(new IdentityRole(StaticDetails.AdminEndUser));
                     }
-                    if (!await _roleManager.RoleExistsAsync(StaticDetails.SuperAdminEndUser))
+                    if(!await _roleManager.RoleExistsAsync(StaticDetails.SuperAdminEndUser))
                     {
                         await _roleManager.CreateAsync(new IdentityRole(StaticDetails.SuperAdminEndUser));
                     }

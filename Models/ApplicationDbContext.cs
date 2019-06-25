@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain
+namespace serviceAssistants.Models
 {
     public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
@@ -14,7 +15,9 @@ namespace Domain
             : base(options)
         {
         }
-
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<Quote> Quotes { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

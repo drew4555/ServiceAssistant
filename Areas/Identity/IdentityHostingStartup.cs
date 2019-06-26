@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using serviceAssistants.Areas.Identity;
 using serviceAssistants.Models;
+using Domain;
 
 [assembly: HostingStartup(typeof(serviceAssistants.Areas.Identity.IdentityHostingStartup))]
 namespace serviceAssistants.Areas.Identity

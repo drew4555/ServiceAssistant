@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
+
 namespace Domain
 {
     public class Client
@@ -15,6 +16,6 @@ namespace Domain
         public string FirstName { get; set; }
         [ForeignKey("ApplicationUser")]
         public string applicationUserId { get; set; }
-        //public virtual ApplicationUser ApplicationUser { get; set; }
+        public virtual ApplicationUser ApplicationUser { get; set; }
     }
 }

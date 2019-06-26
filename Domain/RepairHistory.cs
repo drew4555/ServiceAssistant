@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Domain
 {
-    class RepairHistory
+    public class RepairHistory
     {
         [Key]
         public int Id { get; set; }

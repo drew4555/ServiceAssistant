@@ -17,6 +17,11 @@ namespace Domain
         public DbSet<Client> Clients { get; set; }
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<RepairHistory> RepairHistories { get; set; }
+        public DbSet<Tech> Techs { get; set; }
+        
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

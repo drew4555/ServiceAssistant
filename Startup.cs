@@ -61,7 +61,7 @@ namespace serviceAssistants
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseCookiePolicy();
-
+            app.UseDefaultFiles();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

@@ -1,3 +1,31 @@
 ﻿@{
     Layout = "_Layout";
 }
+@{
+    if (this.User.IsInRole("Customer"))
+    {
+        Layout = "~/Views/Client/_LayoutCustomer.cshtml";
+    }
+    else if (this.User.IsInRole("Tech"))
+    {
+        Layout = "~/Views/Shared/_LayoutTech.cshtml";
+    }
+    else if (this.User.IsInRole("Advisor"))
+    {
+        Layout = "~/Views/Shared/_LayoutAdvisor.cshtml";
+    }
+    else if (this.User.IsInRole("Parts"))
+    {
+        Layout = "~/Views/Shared/_LayoutParts.cshtml";
+    }
+    else if (this.User.IsInRole("Manager"))
+    {
+        Layout = "~/Views/Shared/_LayoutManager.cshtml";
+    }
+    else 
+    {
+        Layout = "~/Views/Shared/_LayoutCustomer.cshtml";
+    }
+}
+  
+

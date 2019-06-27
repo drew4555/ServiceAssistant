@@ -78,7 +78,23 @@ namespace serviceAssistants.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
-                    if(!await _roleManager.RoleExistsAsync(StaticDetails.AdminEndUser))
+                    if(!await _roleManager.RoleExistsAsync(StaticDetails.Advisor))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(StaticDetails.Advisor));
+                    }
+                    if (!await _roleManager.RoleExistsAsync(StaticDetails.Tech))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(StaticDetails.Tech));
+                    }
+                    if (!await _roleManager.RoleExistsAsync(StaticDetails.Customer))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(StaticDetails.Customer));
+                    }
+                    if (!await _roleManager.RoleExistsAsync(StaticDetails.Parts))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(StaticDetails.Parts));
+                    }
+                    if (!await _roleManager.RoleExistsAsync(StaticDetails.AdminEndUser))
                     {
                         await _roleManager.CreateAsync(new IdentityRole(StaticDetails.AdminEndUser));
                     }

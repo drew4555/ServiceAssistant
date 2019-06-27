@@ -7,15 +7,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace serviceAssistants.Controllers
 {
     [Authorize(Roles = "Advisor, Manager")]
-    public class ServiceAdvisorController : Controller
+    public class ClientController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ServiceAdvisorController(ApplicationDbContext context)
+        public ClientController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -49,8 +50,8 @@ namespace serviceAssistants.Controllers
         // GET: Client/Create
         public IActionResult Create()
         {
-            //ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
-            return View();
+            Client client = new Client();
+            return View(client);
         }
 
         // POST: Client/Create
@@ -62,11 +63,10 @@ namespace serviceAssistants.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(client);
+                _context.Clients.Add(client);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Create", "Vehicle", client);
             }
-            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", client.applicationUserId);
             return View(client);
         }
 

@@ -6,28 +6,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Domain;
-using Microsoft.AspNetCore.Authorization;
+using serviceAssistants.Models;
 
 namespace serviceAssistants.Controllers
 {
-    [Authorize(Roles = "Advisor, Manager")]
-    public class ServiceAdvisorController : Controller
+    public class VehicleController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ServiceAdvisorController(ApplicationDbContext context)
+        public VehicleController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Client
+        // GET: Vehicle
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Clients.Include(c => c.ApplicationUser);
+            var applicationDbContext = _context.Vehicles.Include(v => v.Client);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Client/Details/5
+        // GET: Vehicle/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,42 +34,43 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients
-                .Include(c => c.ApplicationUser)
+            var vehicle = await _context.Vehicles
+                .Include(v => v.Client)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (client == null)
+            if (vehicle == null)
             {
                 return NotFound();
             }
 
-            return View(client);
+            return View(vehicle);
         }
 
-        // GET: Client/Create
-        public IActionResult Create()
+        // GET: Vehicle/Create
+        public IActionResult Create(Client client)
         {
-            //ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
-            return View();
+            ClientVehicleViewModel cvm = new ClientVehicleViewModel();
+            cvm.Client = client;
+            return View(cvm);
         }
 
-        // POST: Client/Create
+        // POST: Vehicle/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Email,PhoneNumber,FirstName,applicationUserId")] Client client)
+        public async Task<IActionResult> Create([Bind("Id,Make,Year,Model,Vin,ClientId")] ClientVehicleViewModel clientVehicleViewModel)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(client);
+                clientVehicleViewModel.Vehicle.ClientId = clientVehicleViewModel.Client.Id;
+                _context.Vehicles.Add(clientVehicleViewModel.Vehicle);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Client");
             }
-            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", client.applicationUserId);
-            return View(client);
+            return View(clientVehicleViewModel.Vehicle);
         }
 
-        // GET: Client/Edit/5
+        // GET: Vehicle/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -78,23 +78,23 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients.FindAsync(id);
-            if (client == null)
+            var vehicle = await _context.Vehicles.FindAsync(id);
+            if (vehicle == null)
             {
                 return NotFound();
             }
-            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", client.applicationUserId);
-            return View(client);
+            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Id", vehicle.ClientId);
+            return View(vehicle);
         }
 
-        // POST: Client/Edit/5
+        // POST: Vehicle/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,PhoneNumber,FirstName,applicationUserId")] Client client)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Make,Year,Model,Vin,ClientId")] Vehicle vehicle)
         {
-            if (id != client.Id)
+            if (id != vehicle.Id)
             {
                 return NotFound();
             }
@@ -103,12 +103,12 @@ namespace serviceAssistants.Controllers
             {
                 try
                 {
-                    _context.Update(client);
+                    _context.Update(vehicle);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientExists(client.Id))
+                    if (!VehicleExists(vehicle.Id))
                     {
                         return NotFound();
                     }
@@ -119,11 +119,11 @@ namespace serviceAssistants.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", client.applicationUserId);
-            return View(client);
+            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Id", vehicle.ClientId);
+            return View(vehicle);
         }
 
-        // GET: Client/Delete/5
+        // GET: Vehicle/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -131,31 +131,31 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients
-                .Include(c => c.ApplicationUser)
+            var vehicle = await _context.Vehicles
+                .Include(v => v.Client)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (client == null)
+            if (vehicle == null)
             {
                 return NotFound();
             }
 
-            return View(client);
+            return View(vehicle);
         }
 
-        // POST: Client/Delete/5
+        // POST: Vehicle/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var client = await _context.Clients.FindAsync(id);
-            _context.Clients.Remove(client);
+            var vehicle = await _context.Vehicles.FindAsync(id);
+            _context.Vehicles.Remove(vehicle);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ClientExists(int id)
+        private bool VehicleExists(int id)
         {
-            return _context.Clients.Any(e => e.Id == id);
+            return _context.Vehicles.Any(e => e.Id == id);
         }
     }
 }

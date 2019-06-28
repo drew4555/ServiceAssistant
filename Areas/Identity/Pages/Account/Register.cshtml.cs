@@ -94,6 +94,10 @@ namespace serviceAssistants.Areas.Identity.Pages.Account
                     {
                         await _roleManager.CreateAsync(new IdentityRole(StaticDetails.Parts));
                     }
+                    if (!await _roleManager.RoleExistsAsync(StaticDetails.Manager))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(StaticDetails.Manager));
+                    }
                     if (!await _roleManager.RoleExistsAsync(StaticDetails.AdminEndUser))
                     {
                         await _roleManager.CreateAsync(new IdentityRole(StaticDetails.AdminEndUser));

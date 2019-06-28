@@ -13,8 +13,8 @@ namespace Domain
         public string PartName { get; set; }
         public double PartCost { get; set; }
         public double LaborRate { get; set; }
-        [ForeignKey("Tech")]
-        public int TechId { get; set; }
-        public Tech Tech { get; set; }
+        [ForeignKey("Employee")]
+        public int EmployeeId { get; set; }
+        public Employee Employee { get; set; }
     }
 }

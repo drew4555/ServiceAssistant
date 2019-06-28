@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace serviceAssistants.Controllers
 {
-    [Authorize(Roles = "Advisor, Manager")]
+    [Authorize(Roles = "Advisor, Manager, Customer")]
     public class ClientController : Controller
     {
         private readonly ApplicationDbContext _context;

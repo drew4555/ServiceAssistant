@@ -10,12 +10,12 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace serviceAssistants.Controllers
 {
-    [Authorize(Roles = "Advisor, Manager")]
-    public class ServiceAdvisorController : Controller
+    [Authorize(Roles = "Manager")]
+    public class EmployeeController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ServiceAdvisorController(ApplicationDbContext context)
+        public EmployeeController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -23,7 +23,7 @@ namespace serviceAssistants.Controllers
         // GET: Client
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Clients.Include(c => c.ApplicationUser);
+            var applicationDbContext = _context.Employees.Include(c => c.ApplicationUser);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -48,8 +48,7 @@ namespace serviceAssistants.Controllers
 
         // GET: Client/Create
         public IActionResult Create()
-        {
-            //ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
+        { 
             return View();
         }
 
@@ -58,16 +57,16 @@ namespace serviceAssistants.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Email,PhoneNumber,FirstName,applicationUserId")] Client client)
+        public async Task<IActionResult> Create([Bind("Id,Email,PhoneNumber,FirstName,applicationUserId")] Employee employee)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(client);
+                _context.Employees.Add(employee);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", client.applicationUserId);
-            return View(client);
+           
+            return View(employee);
         }
 
         // GET: Client/Edit/5
@@ -78,13 +77,13 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients.FindAsync(id);
-            if (client == null)
+            var employee = await _context.Employees.FindAsync(id);
+            if (employee == null)
             {
                 return NotFound();
             }
-            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", client.applicationUserId);
-            return View(client);
+            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", employee.Id);
+            return View(employee);
         }
 
         // POST: Client/Edit/5
@@ -92,9 +91,9 @@ namespace serviceAssistants.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,PhoneNumber,FirstName,applicationUserId")] Client client)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,PhoneNumber,FirstName,applicationUserId")] Employee employee)
         {
-            if (id != client.Id)
+            if (id != employee.Id)
             {
                 return NotFound();
             }
@@ -103,12 +102,12 @@ namespace serviceAssistants.Controllers
             {
                 try
                 {
-                    _context.Update(client);
+                    _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientExists(client.Id))
+                    if (!ClientExists(employee.Id))
                     {
                         return NotFound();
                     }
@@ -119,8 +118,8 @@ namespace serviceAssistants.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", client.applicationUserId);
-            return View(client);
+            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", employee.Id);
+            return View(employee);
         }
 
         // GET: Client/Delete/5
@@ -131,7 +130,7 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients
+            var client = await _context.Employees
                 .Include(c => c.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (client == null)
@@ -147,15 +146,15 @@ namespace serviceAssistants.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var client = await _context.Clients.FindAsync(id);
-            _context.Clients.Remove(client);
+            var employee = await _context.Employees.FindAsync(id);
+            _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ClientExists(int id)
         {
-            return _context.Clients.Any(e => e.Id == id);
+            return _context.Employees.Any(e => e.Id == id);
         }
     }
 }

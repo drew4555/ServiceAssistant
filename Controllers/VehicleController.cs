@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Domain;
 using serviceAssistants.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace serviceAssistants.Controllers
 {
+    [Authorize(Roles = "Advisor, Manager, Customer")]
     public class VehicleController : Controller
     {
         private readonly ApplicationDbContext _context;

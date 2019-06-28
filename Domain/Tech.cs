@@ -4,12 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain
 {
-    public class Tech
+    public class Employee
     {
         [Key]
-        public int id { get; set; }
+        public int Id { get; set; }
         public string FirstName { get; set; }
-        public int TechId { get; set; }
+        public int EmployeeNumber { get; set; }
+        public string EmployeeRole { get; set; }
         [ForeignKey("ApplicationUser")]
         public string applicationUserId { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }

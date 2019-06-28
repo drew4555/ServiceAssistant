@@ -15,9 +15,9 @@ namespace Domain
         public int RepairOrder { get; set; }
         [NotMapped]
         public Service[] Services { get; set; }
-        [ForeignKey("Tech")]
-        public int TechId { get; set; }
-        public Tech Tech { get; set; }
+        [ForeignKey("Employee")]
+        public int EmployeeId { get; set; }
+        public Employee Employee { get; set; }
         [ForeignKey("Vehicle")]
         public int VehicleId { get; set; }
         public Vehicle Vehicle { get; set; }

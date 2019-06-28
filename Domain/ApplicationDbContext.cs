@@ -19,7 +19,7 @@ namespace Domain
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<RepairHistory> RepairHistories { get; set; }
-        public DbSet<Tech> Techs { get; set; }
+        public DbSet<Employee> Employees { get; set; }
         
 
         protected override void OnModelCreating(ModelBuilder builder)

@@ -11,9 +11,9 @@ namespace Domain
     {
         [Key]
         public int Id { get; set; }
-        [ForeignKey("Tech")]
+        [ForeignKey("Employee")]
         public int TechId { get; set; }
-        public int Tech { get; set; }
+        public Employee Employee { get; set; }
         [NotMapped]
         public Service[] Service { get; set; }
         public DateTime DateTime { get; set; }

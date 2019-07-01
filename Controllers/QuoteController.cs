@@ -43,7 +43,7 @@ namespace serviceAssistants.Controllers
         }
 
         // GET: Quote/Create
-        public IActionResult Create()
+        public IActionResult Create(int? id)
         {
             return View();
         }
@@ -53,11 +53,11 @@ namespace serviceAssistants.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TechId,Tech,DateTime,RepairCost")] Quote quote)
+        public async Task<IActionResult> Create(Quote quote)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(quote);
+                _context.Quotes.Add(quote);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

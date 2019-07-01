@@ -6,35 +6,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Domain;
-using serviceAssistants.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace serviceAssistants.Controllers
 {
-    [Authorize(Roles = "Advisor, Manager, Customer")]
-    public class VehicleController : Controller
+    public class QuoteController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public VehicleController(ApplicationDbContext context)
+        public QuoteController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Vehicle
-        public async Task<IActionResult> Index(int? id)
+        // GET: Quote
+        public async Task<IActionResult> Index()
         {
-            if (id != null)
-            {
-                var foundVehicles = _context.Vehicles.Where(c => c.ClientId == id);
-                return View(await foundVehicles.ToListAsync());
-            }
-            else
-            {
-                return View(await _context.Vehicles.ToListAsync());
-            }
+            return View(await _context.Quotes.ToListAsync());
         }
-        // GET: Vehicle/Details/5
+
+        // GET: Quote/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -42,43 +32,39 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var vehicle = await _context.Vehicles
-                .Include(v => v.Client)
+            var quote = await _context.Quotes
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (vehicle == null)
+            if (quote == null)
             {
                 return NotFound();
             }
 
-            return View(vehicle);
+            return View(quote);
         }
 
-        // GET: Vehicle/Create
-        public IActionResult Create(Client client)
+        // GET: Quote/Create
+        public IActionResult Create()
         {
-            ClientVehicleViewModel cvm = new ClientVehicleViewModel();
-            cvm.Client = client;
-            return View(cvm);
+            return View();
         }
 
-        // POST: Vehicle/Create
+        // POST: Quote/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Make,Year,Model,Vin,ClientId")] ClientVehicleViewModel clientVehicleViewModel)
+        public async Task<IActionResult> Create([Bind("Id,TechId,Tech,DateTime,RepairCost")] Quote quote)
         {
             if (ModelState.IsValid)
             {
-                clientVehicleViewModel.Vehicle.ClientId = clientVehicleViewModel.Client.Id;
-                _context.Vehicles.Add(clientVehicleViewModel.Vehicle);
+                _context.Add(quote);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "Client");
+                return RedirectToAction(nameof(Index));
             }
-            return View(clientVehicleViewModel.Vehicle);
+            return View(quote);
         }
 
-        // GET: Vehicle/Edit/5
+        // GET: Quote/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,23 +72,22 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var vehicle = await _context.Vehicles.FindAsync(id);
-            if (vehicle == null)
+            var quote = await _context.Quotes.FindAsync(id);
+            if (quote == null)
             {
                 return NotFound();
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Id", vehicle.ClientId);
-            return View(vehicle);
+            return View(quote);
         }
 
-        // POST: Vehicle/Edit/5
+        // POST: Quote/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Make,Year,Model,Vin,ClientId")] Vehicle vehicle)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TechId,Tech,DateTime,RepairCost")] Quote quote)
         {
-            if (id != vehicle.Id)
+            if (id != quote.Id)
             {
                 return NotFound();
             }
@@ -111,12 +96,12 @@ namespace serviceAssistants.Controllers
             {
                 try
                 {
-                    _context.Update(vehicle);
+                    _context.Update(quote);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!VehicleExists(vehicle.Id))
+                    if (!QuoteExists(quote.Id))
                     {
                         return NotFound();
                     }
@@ -127,11 +112,10 @@ namespace serviceAssistants.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Id", vehicle.ClientId);
-            return View(vehicle);
+            return View(quote);
         }
 
-        // GET: Vehicle/Delete/5
+        // GET: Quote/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -139,31 +123,30 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var vehicle = await _context.Vehicles
-                .Include(v => v.Client)
+            var quote = await _context.Quotes
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (vehicle == null)
+            if (quote == null)
             {
                 return NotFound();
             }
 
-            return View(vehicle);
+            return View(quote);
         }
 
-        // POST: Vehicle/Delete/5
+        // POST: Quote/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var vehicle = await _context.Vehicles.FindAsync(id);
-            _context.Vehicles.Remove(vehicle);
+            var quote = await _context.Quotes.FindAsync(id);
+            _context.Quotes.Remove(quote);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool VehicleExists(int id)
+        private bool QuoteExists(int id)
         {
-            return _context.Vehicles.Any(e => e.Id == id);
+            return _context.Quotes.Any(e => e.Id == id);
         }
     }
 }

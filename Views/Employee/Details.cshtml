@@ -1,4 +1,4 @@
-﻿@model Domain.Client
+﻿@model Domain.Employee
 
 @{
     ViewData["Title"] = "Details";
@@ -27,12 +27,6 @@
         </dt>
         <dd>
             @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ApplicationUser)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ApplicationUser.Id)
         </dd>
     </dl>
 </div>

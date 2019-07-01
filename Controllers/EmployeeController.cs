@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
+using serviceAssistants.Models;
 
 namespace serviceAssistants.Controllers
 {
@@ -20,14 +21,14 @@ namespace serviceAssistants.Controllers
             _context = context;
         }
 
-        // GET: Client
+        // GET: Employee
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Employees.Include(c => c.ApplicationUser);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Client/Details/5
+        // GET: Employee/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,32 +47,41 @@ namespace serviceAssistants.Controllers
             return View(client);
         }
 
-        // GET: Client/Create
+        // GET: Employee/Create
         public IActionResult Create()
-        { 
-            return View();
+        {
+
+            EmployeeViewModel emv = new EmployeeViewModel();
+            List<string> roles = new List<string> { "Tech", "Advisor", "Parts", "Manager" };
+            ViewBag.Roles = roles;
+            return View(emv);
+
         }
 
-        // POST: Client/Create
+        // POST: Employee/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Email,PhoneNumber,FirstName,applicationUserId")] Employee employee)
+        public async Task<IActionResult> Create(/*[Bind("employeeViewModel")]*/ EmployeeViewModel employeeViewModel)
         {
             if (ModelState.IsValid)
             {
+                var employee = employeeViewModel.Employee;
                 _context.Employees.Add(employee);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
            
-            return View(employee);
+            return View(employeeViewModel.Employee);
         }
 
-        // GET: Client/Edit/5
+        // GET: Employee/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            EmployeeViewModel emv = new EmployeeViewModel();
+            List<string> roles = new List<string> { "Tech", "Advisor", "Parts", "Manager" };
+            ViewBag.Roles = roles;
             if (id == null)
             {
                 return NotFound();
@@ -82,32 +92,35 @@ namespace serviceAssistants.Controllers
             {
                 return NotFound();
             }
-            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", employee.Id);
-            return View(employee);
+
+            return View(emv);
         }
 
-        // POST: Client/Edit/5
+        // POST: Employee/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,PhoneNumber,FirstName,applicationUserId")] Employee employee)
+        public async Task<IActionResult> Edit(int id, /*[Bind("Id,Email,PhoneNumber,FirstName,applicationUserId"*/ EmployeeViewModel employeeViewModel)
         {
+            employeeViewModel.Employee.Id = id;
+            var employee = employeeViewModel.Employee;
             if (id != employee.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {
+                   
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientExists(employee.Id))
+                    if (!ClientExists(employeeViewModel.Employee.Id))
                     {
                         return NotFound();
                     }
@@ -118,11 +131,12 @@ namespace serviceAssistants.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", employee.Id);
+           
+            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", employeeViewModel.Employee.Id);
             return View(employee);
         }
 
-        // GET: Client/Delete/5
+        // GET: Employee/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -141,7 +155,7 @@ namespace serviceAssistants.Controllers
             return View(client);
         }
 
-        // POST: Client/Delete/5
+        // POST: Employee/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -4,14 +4,16 @@ using Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190702122314_migration7")]
+    partial class migration7
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,13 +79,9 @@ namespace Domain.Migrations
 
                     b.Property<int>("TechId");
 
-                    b.Property<int>("VehicleId");
-
                     b.HasKey("Id");
 
                     b.HasIndex("TechId");
-
-                    b.HasIndex("VehicleId");
 
                     b.ToTable("Quotes");
                 });
@@ -340,11 +338,6 @@ namespace Domain.Migrations
                     b.HasOne("Domain.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("TechId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Domain.Vehicle", "Vehicle")
-                        .WithMany()
-                        .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

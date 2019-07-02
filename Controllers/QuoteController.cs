@@ -19,9 +19,17 @@ namespace serviceAssistants.Controllers
         }
 
         // GET: Quote
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
-            return View(await _context.Quotes.ToListAsync());
+            if (id != null)
+            {
+                var foundQuotes = _context.Quotes.Where(q => q.VehicleId == id);
+                return View(await foundQuotes.ToListAsync());
+            }
+            else
+            {
+                return View(await _context.Quotes.ToListAsync());
+            }
         }
 
         // GET: Quote/Details/5
@@ -43,9 +51,11 @@ namespace serviceAssistants.Controllers
         }
 
         // GET: Quote/Create
-        public IActionResult Create(int? id)
+        public IActionResult Create(int id)
         {
-            return View();
+            Quote quote = new Quote();
+            quote.VehicleId = id;
+            return View(quote);
         }
 
         // POST: Quote/Create
@@ -57,6 +67,8 @@ namespace serviceAssistants.Controllers
         {
             if (ModelState.IsValid)
             {
+                quote.Id = 0;
+                quote.TechId = 1;
                 _context.Quotes.Add(quote);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

@@ -17,7 +17,7 @@ namespace serviceAssistants.Controllers
 
         public IActionResult About()
         {
-            ViewData["Message"] = "History";
+            ViewData["Message"] = "About";
 
             return View();
         }

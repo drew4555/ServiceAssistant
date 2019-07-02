@@ -18,6 +18,9 @@ namespace Domain
         public Service[] Service { get; set; }
         public DateTime DateTime { get; set; }
         public double RepairCost { get; set; }
+        [ForeignKey("Vehicle")]
+        public int VehicleId { get; set; }
+        public Vehicle Vehicle { get; set; }
 
     }
 }

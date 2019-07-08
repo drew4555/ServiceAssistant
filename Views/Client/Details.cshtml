@@ -4,10 +4,9 @@
     ViewData["Title"] = "Details";
 }
 
-<h2>Details</h2>
+<h2>Customer Details</h2>
 
 <div>
-    <h4>Client</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -28,15 +27,11 @@
         <dd>
             @Html.DisplayFor(model => model.FirstName)
         </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ApplicationUser)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ApplicationUser.Id)
-        </dd>
     </dl>
 </div>
 <div>
+    <iframe src='https://www.timetap.com/emb/258356' frameborder='0' width='840' height='500'></iframe>
+    @*<a href="https://serviceassistant.timetap.com">Schedule Appointment</a> |*@
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

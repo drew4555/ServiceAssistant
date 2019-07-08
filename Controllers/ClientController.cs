@@ -27,11 +27,14 @@ namespace serviceAssistants.Controllers
             var applicationDbContext = _context.Clients.Include(c => c.ApplicationUser);
             return View(await applicationDbContext.ToListAsync());
         }
-
+         
+        
+           
+        
         // GET: Client/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-
+            id = 1;
             if (id == null)
             {
                 return NotFound();
@@ -74,8 +77,10 @@ namespace serviceAssistants.Controllers
         // GET: Client/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            id = 1;
             if (id == null)
             {
+
                 return NotFound();
             }
 

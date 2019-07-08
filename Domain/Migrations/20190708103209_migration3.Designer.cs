@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190701194108_mygration6")]
-    partial class mygration6
+    [Migration("20190708103209_migration3")]
+    partial class migration3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -75,13 +75,21 @@ namespace Domain.Migrations
 
                     b.Property<DateTime>("DateTime");
 
+                    b.Property<bool>("IsComplete");
+
                     b.Property<double>("RepairCost");
 
+                    b.Property<string>("Status");
+
                     b.Property<int>("TechId");
+
+                    b.Property<int>("VehicleId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TechId");
+
+                    b.HasIndex("VehicleId");
 
                     b.ToTable("Quotes");
                 });
@@ -109,6 +117,31 @@ namespace Domain.Migrations
                     b.HasIndex("VehicleId");
 
                     b.ToTable("RepairHistories");
+                });
+
+            modelBuilder.Entity("Domain.Service", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("IsApproved");
+
+                    b.Property<double>("LaborRate");
+
+                    b.Property<double>("PartCost");
+
+                    b.Property<string>("PartName");
+
+                    b.Property<int>("QuoteNumber");
+
+                    b.Property<double>("TotalCost");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuoteNumber");
+
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("Domain.Vehicle", b =>
@@ -339,6 +372,11 @@ namespace Domain.Migrations
                         .WithMany()
                         .HasForeignKey("TechId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Domain.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Domain.RepairHistory", b =>
@@ -351,6 +389,14 @@ namespace Domain.Migrations
                     b.HasOne("Domain.Vehicle", "Vehicle")
                         .WithMany()
                         .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Domain.Service", b =>
+                {
+                    b.HasOne("Domain.Quote", "Quote")
+                        .WithMany()
+                        .HasForeignKey("QuoteNumber")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

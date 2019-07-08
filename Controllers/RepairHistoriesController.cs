@@ -6,28 +6,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Domain;
-using serviceAssistants.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace serviceAssistants.Controllers
 {
-    [Authorize(Roles = "Advisor, Manager, Customer")]
-    public class VehicleController : Controller
+    public class RepairHistoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public VehicleController(ApplicationDbContext context)
+        public RepairHistoriesController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Vehicle
-        public async Task<IActionResult> Index(int? id)
+        // GET: RepairHistories
+        public async Task<IActionResult> Index(int?id)
         {
-            id = 1;
             if (id != null)
             {
-                var foundVehicles = _context.Vehicles.Where(c => c.ClientId == id);
+                var foundVehicles = _context.RepairHistories.Where(c => c.VehicleId == id);
                 return View(await foundVehicles.ToListAsync());
             }
             else
@@ -35,7 +31,8 @@ namespace serviceAssistants.Controllers
                 return View(await _context.Vehicles.ToListAsync());
             }
         }
-        // GET: Vehicle/Details/5
+
+        // GET: RepairHistories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -43,43 +40,45 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var vehicle = await _context.Vehicles
-                .Include(v => v.Client)
+            var repairHistory = await _context.RepairHistories
+                .Include(r => r.Employee)
+                .Include(r => r.Vehicle)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (vehicle == null)
+            if (repairHistory == null)
             {
                 return NotFound();
             }
 
-            return View(vehicle);
+            return View(repairHistory);
         }
 
-        // GET: Vehicle/Create
-        public IActionResult Create(Client client)
+        // GET: RepairHistories/Create
+        public IActionResult Create()
         {
-            ClientVehicleViewModel cvm = new ClientVehicleViewModel();
-            cvm.Client = client;
-            return View(cvm);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id");
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "Id", "Id");
+            return View();
         }
 
-        // POST: Vehicle/Create
+        // POST: RepairHistories/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ClientVehicleViewModel clientVehicleViewModel)
+        public async Task<IActionResult> Create([Bind("Id,DateTime,Cost,RepairOrder,EmployeeId,VehicleId")] RepairHistory repairHistory)
         {
             if (ModelState.IsValid)
             {
-                clientVehicleViewModel.Vehicle.ClientId = clientVehicleViewModel.Client.Id;
-                _context.Vehicles.Add(clientVehicleViewModel.Vehicle);
+                _context.Add(repairHistory);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "Client");
+                return RedirectToAction(nameof(Index));
             }
-            return View(clientVehicleViewModel.Vehicle);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", repairHistory.EmployeeId);
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "Id", "Id", repairHistory.VehicleId);
+            return View(repairHistory);
         }
 
-        // GET: Vehicle/Edit/5
+        // GET: RepairHistories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -87,23 +86,24 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var vehicle = await _context.Vehicles.FindAsync(id);
-            if (vehicle == null)
+            var repairHistory = await _context.RepairHistories.FindAsync(id);
+            if (repairHistory == null)
             {
                 return NotFound();
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Id", vehicle.ClientId);
-            return View(vehicle);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", repairHistory.EmployeeId);
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "Id", "Id", repairHistory.VehicleId);
+            return View(repairHistory);
         }
 
-        // POST: Vehicle/Edit/5
+        // POST: RepairHistories/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Make,Year,Model,Vin,ClientId")] Vehicle vehicle)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,DateTime,Cost,RepairOrder,EmployeeId,VehicleId")] RepairHistory repairHistory)
         {
-            if (id != vehicle.Id)
+            if (id != repairHistory.Id)
             {
                 return NotFound();
             }
@@ -112,12 +112,12 @@ namespace serviceAssistants.Controllers
             {
                 try
                 {
-                    _context.Update(vehicle);
+                    _context.Update(repairHistory);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!VehicleExists(vehicle.Id))
+                    if (!RepairHistoryExists(repairHistory.Id))
                     {
                         return NotFound();
                     }
@@ -128,11 +128,12 @@ namespace serviceAssistants.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "Id", vehicle.ClientId);
-            return View(vehicle);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", repairHistory.EmployeeId);
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "Id", "Id", repairHistory.VehicleId);
+            return View(repairHistory);
         }
 
-        // GET: Vehicle/Delete/5
+        // GET: RepairHistories/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -140,31 +141,32 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var vehicle = await _context.Vehicles
-                .Include(v => v.Client)
+            var repairHistory = await _context.RepairHistories
+                .Include(r => r.Employee)
+                .Include(r => r.Vehicle)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (vehicle == null)
+            if (repairHistory == null)
             {
                 return NotFound();
             }
 
-            return View(vehicle);
+            return View(repairHistory);
         }
 
-        // POST: Vehicle/Delete/5
+        // POST: RepairHistories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var vehicle = await _context.Vehicles.FindAsync(id);
-            _context.Vehicles.Remove(vehicle);
+            var repairHistory = await _context.RepairHistories.FindAsync(id);
+            _context.RepairHistories.Remove(repairHistory);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool VehicleExists(int id)
+        private bool RepairHistoryExists(int id)
         {
-            return _context.Vehicles.Any(e => e.Id == id);
+            return _context.RepairHistories.Any(e => e.Id == id);
         }
     }
 }

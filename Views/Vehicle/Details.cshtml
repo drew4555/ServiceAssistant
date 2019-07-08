@@ -43,8 +43,9 @@
     </dl>
 </div>
 <div>
-    <a href="/quote/create/@Model.Id">Create Quote</a> |
-    <a href="/History/Index/@Model.Id">Vehicle History</a> |
+    <a asp-controller="quote" asp-action="create" asp-route-id="@Model.Id">New Quote</a> |
+    <a asp-controller="quote" asp-action="index" asp-route-id="@Model.Id">View Quotes</a> |
+    <a asp-controller="History" asp-action="index" asp-route-id="@Model.Id">View History</a> |
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

@@ -6,36 +6,37 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Domain;
-using serviceAssistants.Models;
-using Infrastructure;
-
 
 namespace serviceAssistants.Controllers
 {
-    public class QuoteController : Controller
+    public class ServiceController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public QuoteController(ApplicationDbContext context)
+        public ServiceController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Quote
+        // GET: Service
         public async Task<IActionResult> Index(int? id)
         {
             if (id != null)
             {
-                var foundQuotes = _context.Quotes.Where(q => q.VehicleId == id);
-                return View(await foundQuotes.ToListAsync());
+                var foundServices = _context.Services.Where(c => c.QuoteNumber == id);
+                foreach (var service in foundServices)
+                {
+                    service.TotalCost = service.LaborRate + service.PartCost;
+                }
+                return View(await foundServices.ToListAsync());
             }
             else
             {
-                return View(await _context.Quotes.ToListAsync());
+                return View(await _context.Services.ToListAsync());
             }
         }
 
-        // GET: Quote/Details/5
+        // GET: Service/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -43,50 +44,42 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var quote = await _context.Quotes
+            var service = await _context.Services
+                .Include(s => s.Quote)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (quote == null)
+            if (service == null)
             {
                 return NotFound();
             }
-            QuoteViewModel qvm = new QuoteViewModel();
-            qvm.Quote = quote;
-            var services = _context.Services.Where(s => s.QuoteNumber == id).ToArray();
-            qvm.Services = services;
-            return View(qvm);
+
+            return View(service);
         }
 
-        // GET: Quote/Create
-        public IActionResult Create(int id)
+        // GET: Service/Create
+        public IActionResult Create()
         {
-            Quote quote = new Quote();
-            quote.VehicleId = id;
-            return View(quote);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id");
+            ViewData["QuoteNumber"] = new SelectList(_context.Quotes, "Id", "Id");
+            return View();
         }
 
-        // POST: Quote/Create
+        // POST: Service/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Quote quote)
+        public async Task<IActionResult> Create(Service service)
         {
             if (ModelState.IsValid)
             {
-                quote.Id = 0;
-                quote.TechId = 1;
-                _context.Quotes.Add(quote);
+                _context.Services.Add(service);
                 await _context.SaveChangesAsync();
-                if (this.User.IsInRole("Tech"))
-                {
-                    var response2 = SendSimpleMessageChunk.SendPartMessage();
-                }
-                return RedirectToAction("Create","Service");
+                return RedirectToAction(nameof(Index));
             }
-            return View(quote);
+            return View(service);
         }
 
-        // GET: Quote/Edit/5
+        // GET: Service/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -94,22 +87,22 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var quote = await _context.Quotes.FindAsync(id);
-            if (quote == null)
+            var service = await _context.Services.FindAsync(id);
+            if (service == null)
             {
                 return NotFound();
             }
-            return View(quote);
+            return View(service);
         }
 
-        // POST: Quote/Edit/5
+        // POST: Service/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Quote quote)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,PartName,PartCost,LaborRate,IsApproved,EmployeeId,QuoteNumber")] Service service)
         {
-            if (id != quote.Id)
+            if (id != service.Id)
             {
                 return NotFound();
             }
@@ -118,26 +111,12 @@ namespace serviceAssistants.Controllers
             {
                 try
                 {
-                    _context.Update(quote);
+                    _context.Update(service);
                     await _context.SaveChangesAsync();
-                    if (this.User.IsInRole("Tech"))
-                    {
-                        var response = SendSimpleMessageChunk.SendPartMessage();
-                    }
-                    if (this.User.IsInRole("Parts"))
-                    {
-                        var responseTech = SendSimpleMessageChunk.SendTechMessage();
-                    }
-                    if (this.User.IsInRole("Tech") && quote.IsComplete == true)
-                    {
-                        var finalResponse = SendSimpleMessageChunk.SendFinalMessage();
-                    }
-                    
-
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!QuoteExists(quote.Id))
+                    if (!ServiceExists(service.Id))
                     {
                         return NotFound();
                     }
@@ -148,10 +127,11 @@ namespace serviceAssistants.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(quote);
+            ViewData["QuoteNumber"] = new SelectList(_context.Quotes, "Id", "Id", service.QuoteNumber);
+            return View(service);
         }
 
-        // GET: Quote/Delete/5
+        // GET: Service/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -159,30 +139,31 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            var quote = await _context.Quotes
+            var service = await _context.Services
+                .Include(s => s.Quote)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (quote == null)
+            if (service == null)
             {
                 return NotFound();
             }
 
-            return View(quote);
+            return View(service);
         }
 
-        // POST: Quote/Delete/5
+        // POST: Service/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var quote = await _context.Quotes.FindAsync(id);
-            _context.Quotes.Remove(quote);
+            var service = await _context.Services.FindAsync(id);
+            _context.Services.Remove(service);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool QuoteExists(int id)
+        private bool ServiceExists(int id)
         {
-            return _context.Quotes.Any(e => e.Id == id);
+            return _context.Services.Any(e => e.Id == id);
         }
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Domain;
+using Infrastructure;
 
 namespace serviceAssistants
 {
@@ -40,8 +41,10 @@ namespace serviceAssistants
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
-         
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>());
+            services.AddTransient<IEmailService, EmailService>();
 
         }
 
@@ -57,6 +60,7 @@ namespace serviceAssistants
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+                 
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseHttpsRedirection();

@@ -3,6 +3,58 @@ for details on configuring this project to bundle and minify static web assets. 
 body {
     padding-top: 50px;
     padding-bottom: 20px;
+    background-color: #EEE;
+    background-image: url(../images/ServiceDepartment1.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+h1 {
+    background-color: darkgray;
+    color: black;
+}
+h2 {
+    background-color: darkgray;
+    color: black;
+}
+h3 {
+    background-color: darkgray;
+    color: black;
+}
+h4 {
+    background-color: darkgray;
+    color: black;
+}
+h5 {
+    background-color: darkgray;
+    color: black;
+}
+p {
+    background-color: darkgray;
+    color: black;
+}
+tr {
+    background-color: darkgray;
+    color: black;
+}
+td {
+    background-color: darkgray;
+    color: black;
+}
+dt {
+    background-color: darkgray;
+    color: black;
+}
+dd {
+    background-color: darkgray;
+    color: black;
+}
+div{
+    text-align: center
+}
+form{
+    align-content:center
 }
 
 /* Wrapping element */
@@ -10,22 +62,6 @@ body {
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
-}
-
-/* Carousel */
-.carousel-caption p {
-    font-size: 20px;
-    line-height: 1.4;
-}
-
-/* Make .svg files in the carousel display properly in older browsers */
-.carousel-inner .item img[src$=".svg"] {
-    width: 100%;
-}
-
-/* QR code generator */
-#qrCode {
-    margin: 15px;
 }
 
 /* Hide/rearrange for smaller screens */

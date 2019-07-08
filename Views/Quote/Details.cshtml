@@ -1,4 +1,4 @@
-﻿@model Domain.Quote
+﻿@model serviceAssistants.Models.QuoteViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -11,32 +11,45 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.TechId)
+            @Html.DisplayNameFor(model => model.Quote.TechId)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.TechId)
+            @Html.DisplayFor(model => model.Quote.TechId)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.DateTime)
+            @Html.DisplayNameFor(model => model.Quote.DateTime)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.DateTime)
+            @Html.DisplayFor(model => model.Quote.DateTime)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Service)
+            @Html.DisplayNameFor(model => model.Quote.IsComplete)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Service)
+            @Html.DisplayFor(model => model.Quote.IsComplete)
+        </dd>
+        <dd>
+            @if (Model.Services != null)
+            {
+                @foreach (var service in Model.Services)
+                {
+                    @service.PartName
+                    @service.PartCost
+                    @service.LaborRate
+                }
+            }
+
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.RepairCost)
+            @Html.DisplayNameFor(model => model.Quote.RepairCost)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.RepairCost)
+            @Html.DisplayFor(model => model.Quote.RepairCost)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a href="/Service/Create/@Model.Quote.Id">Add Service</a> |"
+    <a asp-action="Edit" asp-route-id="@Model.Quote.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

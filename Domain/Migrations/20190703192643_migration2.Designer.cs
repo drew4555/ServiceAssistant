@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190627141222_migration1")]
-    partial class migration1
+    [Migration("20190703192643_migration2")]
+    partial class migration2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,6 +42,31 @@ namespace Domain.Migrations
                     b.ToTable("Clients");
                 });
 
+            modelBuilder.Entity("Domain.Employee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Email");
+
+                    b.Property<int>("EmployeeNumber");
+
+                    b.Property<string>("EmployeeRole");
+
+                    b.Property<string>("FirstName");
+
+                    b.Property<string>("PhoneNumber");
+
+                    b.Property<string>("applicationUserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("applicationUserId");
+
+                    b.ToTable("Employees");
+                });
+
             modelBuilder.Entity("Domain.Quote", b =>
                 {
                     b.Property<int>("Id")
@@ -52,11 +77,17 @@ namespace Domain.Migrations
 
                     b.Property<double>("RepairCost");
 
-                    b.Property<int>("Tech");
+                    b.Property<string>("Status");
 
                     b.Property<int>("TechId");
 
+                    b.Property<int>("VehicleId");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TechId");
+
+                    b.HasIndex("VehicleId");
 
                     b.ToTable("Quotes");
                 });
@@ -71,38 +102,44 @@ namespace Domain.Migrations
 
                     b.Property<DateTime>("DateTime");
 
-                    b.Property<int>("RepairOrder");
+                    b.Property<int>("EmployeeId");
 
-                    b.Property<int>("TechId");
+                    b.Property<int>("RepairOrder");
 
                     b.Property<int>("VehicleId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TechId");
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("VehicleId");
 
                     b.ToTable("RepairHistories");
                 });
 
-            modelBuilder.Entity("Domain.Tech", b =>
+            modelBuilder.Entity("Domain.Service", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("FirstName");
+                    b.Property<bool>("IsApproved");
 
-                    b.Property<int>("TechId");
+                    b.Property<double>("LaborRate");
 
-                    b.Property<string>("applicationUserId");
+                    b.Property<double>("PartCost");
 
-                    b.HasKey("id");
+                    b.Property<string>("PartName");
 
-                    b.HasIndex("applicationUserId");
+                    b.Property<int>("QuoteNumber");
 
-                    b.ToTable("Techs");
+                    b.Property<double>("TotalCost");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuoteNumber");
+
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("Domain.Vehicle", b =>
@@ -320,9 +357,16 @@ namespace Domain.Migrations
                         .HasForeignKey("applicationUserId");
                 });
 
-            modelBuilder.Entity("Domain.RepairHistory", b =>
+            modelBuilder.Entity("Domain.Employee", b =>
                 {
-                    b.HasOne("Domain.Tech", "Tech")
+                    b.HasOne("Domain.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("applicationUserId");
+                });
+
+            modelBuilder.Entity("Domain.Quote", b =>
+                {
+                    b.HasOne("Domain.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("TechId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -333,11 +377,25 @@ namespace Domain.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Domain.Tech", b =>
+            modelBuilder.Entity("Domain.RepairHistory", b =>
                 {
-                    b.HasOne("Domain.ApplicationUser", "ApplicationUser")
+                    b.HasOne("Domain.Employee", "Employee")
                         .WithMany()
-                        .HasForeignKey("applicationUserId");
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Domain.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Domain.Service", b =>
+                {
+                    b.HasOne("Domain.Quote", "Quote")
+                        .WithMany()
+                        .HasForeignKey("QuoteNumber")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Domain.Vehicle", b =>

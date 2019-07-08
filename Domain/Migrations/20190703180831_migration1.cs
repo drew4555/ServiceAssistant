@@ -54,22 +54,6 @@ namespace Domain.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Quotes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    TechId = table.Column<int>(nullable: false),
-                    Tech = table.Column<int>(nullable: false),
-                    DateTime = table.Column<DateTime>(nullable: false),
-                    RepairCost = table.Column<double>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Quotes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -198,20 +182,23 @@ namespace Domain.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Techs",
+                name: "Employees",
                 columns: table => new
                 {
-                    id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     FirstName = table.Column<string>(nullable: true),
-                    TechId = table.Column<int>(nullable: false),
+                    EmployeeNumber = table.Column<int>(nullable: false),
+                    EmployeeRole = table.Column<string>(nullable: true),
+                    Email = table.Column<string>(nullable: true),
+                    PhoneNumber = table.Column<string>(nullable: true),
                     applicationUserId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Techs", x => x.id);
+                    table.PrimaryKey("PK_Employees", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Techs_AspNetUsers_applicationUserId",
+                        name: "FK_Employees_AspNetUsers_applicationUserId",
                         column: x => x.applicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -242,6 +229,35 @@ namespace Domain.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Quotes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    TechId = table.Column<int>(nullable: false),
+                    Status = table.Column<string>(nullable: true),
+                    DateTime = table.Column<DateTime>(nullable: false),
+                    RepairCost = table.Column<double>(nullable: false),
+                    VehicleId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Quotes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Quotes_Employees_TechId",
+                        column: x => x.TechId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Quotes_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RepairHistories",
                 columns: table => new
                 {
@@ -250,22 +266,45 @@ namespace Domain.Migrations
                     DateTime = table.Column<DateTime>(nullable: false),
                     Cost = table.Column<double>(nullable: false),
                     RepairOrder = table.Column<int>(nullable: false),
-                    TechId = table.Column<int>(nullable: false),
+                    EmployeeId = table.Column<int>(nullable: false),
                     VehicleId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RepairHistories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RepairHistories_Techs_TechId",
-                        column: x => x.TechId,
-                        principalTable: "Techs",
-                        principalColumn: "id",
+                        name: "FK_RepairHistories_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_RepairHistories_Vehicles_VehicleId",
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Services",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    PartName = table.Column<string>(nullable: true),
+                    PartCost = table.Column<double>(nullable: false),
+                    LaborRate = table.Column<double>(nullable: false),
+                    IsApproved = table.Column<bool>(nullable: false),
+                    QuoteNumber = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Services", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Services_Quotes_QuoteNumber",
+                        column: x => x.QuoteNumber,
+                        principalTable: "Quotes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -315,9 +354,24 @@ namespace Domain.Migrations
                 column: "applicationUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RepairHistories_TechId",
-                table: "RepairHistories",
+                name: "IX_Employees_applicationUserId",
+                table: "Employees",
+                column: "applicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quotes_TechId",
+                table: "Quotes",
                 column: "TechId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quotes_VehicleId",
+                table: "Quotes",
+                column: "VehicleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RepairHistories_EmployeeId",
+                table: "RepairHistories",
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RepairHistories_VehicleId",
@@ -325,9 +379,9 @@ namespace Domain.Migrations
                 column: "VehicleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Techs_applicationUserId",
-                table: "Techs",
-                column: "applicationUserId");
+                name: "IX_Services_QuoteNumber",
+                table: "Services",
+                column: "QuoteNumber");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vehicles_ClientId",
@@ -353,16 +407,19 @@ namespace Domain.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Quotes");
+                name: "RepairHistories");
 
             migrationBuilder.DropTable(
-                name: "RepairHistories");
+                name: "Services");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Techs");
+                name: "Quotes");
+
+            migrationBuilder.DropTable(
+                name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "Vehicles");

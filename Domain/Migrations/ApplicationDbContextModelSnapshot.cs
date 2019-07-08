@@ -73,7 +73,11 @@ namespace Domain.Migrations
 
                     b.Property<DateTime>("DateTime");
 
+                    b.Property<bool>("IsComplete");
+
                     b.Property<double>("RepairCost");
+
+                    b.Property<string>("Status");
 
                     b.Property<int>("TechId");
 
@@ -111,6 +115,31 @@ namespace Domain.Migrations
                     b.HasIndex("VehicleId");
 
                     b.ToTable("RepairHistories");
+                });
+
+            modelBuilder.Entity("Domain.Service", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("IsApproved");
+
+                    b.Property<double>("LaborRate");
+
+                    b.Property<double>("PartCost");
+
+                    b.Property<string>("PartName");
+
+                    b.Property<int>("QuoteNumber");
+
+                    b.Property<double>("TotalCost");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuoteNumber");
+
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("Domain.Vehicle", b =>
@@ -358,6 +387,14 @@ namespace Domain.Migrations
                     b.HasOne("Domain.Vehicle", "Vehicle")
                         .WithMany()
                         .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Domain.Service", b =>
+                {
+                    b.HasOne("Domain.Quote", "Quote")
+                        .WithMany()
+                        .HasForeignKey("QuoteNumber")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

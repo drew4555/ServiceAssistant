@@ -79,7 +79,6 @@ namespace serviceAssistants.Controllers
         // GET: Employee/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            EmployeeViewModel emv = new EmployeeViewModel();
             List<string> roles = new List<string> { "Tech", "Advisor", "Parts", "Manager" };
             ViewBag.Roles = roles;
             if (id == null)
@@ -93,7 +92,7 @@ namespace serviceAssistants.Controllers
                 return NotFound();
             }
 
-            return View(emv);
+            return View(employee);
         }
 
         // POST: Employee/Edit/5
@@ -101,10 +100,9 @@ namespace serviceAssistants.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, /*[Bind("Id,Email,PhoneNumber,FirstName,applicationUserId"*/ EmployeeViewModel employeeViewModel)
+        public async Task<IActionResult> Edit(int id, /*[Bind("Id,Email,PhoneNumber,FirstName,applicationUserId"*/ Employee employee)
         {
-            employeeViewModel.Employee.Id = id;
-            var employee = employeeViewModel.Employee;
+            employee.Id = id;
             if (id != employee.Id)
             {
                 return NotFound();
@@ -120,7 +118,7 @@ namespace serviceAssistants.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientExists(employeeViewModel.Employee.Id))
+                    if (!ClientExists(employee.Id))
                     {
                         return NotFound();
                     }
@@ -132,7 +130,7 @@ namespace serviceAssistants.Controllers
                 return RedirectToAction(nameof(Index));
             }
            
-            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", employeeViewModel.Employee.Id);
+            ViewData["applicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", employee.Id);
             return View(employee);
         }
 
